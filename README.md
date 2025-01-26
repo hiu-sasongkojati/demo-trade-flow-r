@@ -84,3 +84,5 @@ Finally, display the final plot.
 ```
 print(base_map)
 ```
+The end result is the following map plot:
+![Map plot](https://github.com/hiu-sasongkojati/demo-trade-flow-r/blob/main/result%20map%20plot.png)
