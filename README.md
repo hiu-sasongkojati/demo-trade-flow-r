@@ -104,7 +104,7 @@ trade_data <- data.frame(
   dest_long = c(-95.7129, 104.1954, 10.4515, 133.7751)
 )
 ```
-Then, since there is only one source country with multiple destination countries of varying distances, I need to take into account date lines. 
+Then, since there is only one source country with multiple destination countries of varying distances, I need to take into account the international date line. 
 
 Let's consider Japan and USA -- two countries at opposite ends of one another. When a geodesic line is calculated between these two points, the resulting path may lie on a single continuous line that crosses the international date line. I want to make sure that this line is plotted so that it appears on the map without being cut off by the international date line. Otherwise, the line would jump to the opposite side of the map to continue. Here is a simple visual representation of it:
 
@@ -144,3 +144,26 @@ generate_curve <- function(src_long, src_lat, dst_long, dst_lat) {
 
 The other code segments should be similar to the originals above. Just copy and paste them and display the final plot using `print(base_map)`, like so:
 ![Map plot with multiple lines](https://github.com/hiu-sasongkojati/demo-trade-flow-r/blob/main/result%20map%20plot%20-%20multiple%20lines.png)
+
+## Multiple segment lines across the international date line
+To have a trade flow line that does not produce a straight line in between segment breaks like the one above, you will need to assign these lines into groups.
+
+Essentially, for every single segment for a trade flow line, it is to be grouped in `i`. Else, if it breaks the international date line (thus producing multiple segments), concatenate the group to `j`. As written below under the `generate_curve` function. [(but why `i` and `j`?)](https://www.reddit.com/r/programming/comments/egka6/why_are_variables_i_and_j_used_for_counters/)
+
+```
+...
+else {
+    # Multiple segments
+    do.call(
+      rbind,
+      lapply(1:length(gc_points), function(j) {
+        data.frame(
+          lon = gc_points[[j]][, 1],
+          lat = gc_points[[j]][, 2],
+          group = paste0(i, "-", j)
+        )
+      }
+...
+```
+Run this along with the rest of the segments above and you will get something like this:
+![map with split segments](https://github.com/hiu-sasongkojati/demo-trade-flow-r/blob/main/result%20map%20plot%20-%20multiple%20lines%20(split%20at%20date%20line).png)
