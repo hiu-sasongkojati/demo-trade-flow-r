@@ -36,6 +36,7 @@ trade_data <- data.frame(
   dest_long = c(-102.5528, 127.7669, 2.2137, 133.7751)
 )
 ```
+(I won't be using the `value` vector for this demo. It is there for completeness' sake).
 
 ## Create the map plot base
 Next, before I do anything else, I asked R to create a world map by using the `geom_map()` function of the `ggplot2` package.
