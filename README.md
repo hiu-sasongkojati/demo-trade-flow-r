@@ -10,12 +10,11 @@ This repo is meant to document what I did throughout one evening of reading the 
 I needed to install some packages and call them as libraries first.
 
 ```
->install.packages(c("ggplot2", "sf", "dplyr", "maps", "geosphere"))
+install.packages(c("ggplot2", "sf", "dplyr", "maps", "geosphere"))
 ```
 
 Calling the respective libraries into the current R instance:
 ```
-install.packages(c("ggplot2", "sf", "dplyr", "maps", "geosphere"))
 library(ggplot2)
 library(sf)
 library(dplyr)
