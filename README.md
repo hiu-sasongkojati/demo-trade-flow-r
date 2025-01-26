@@ -4,7 +4,7 @@ In one of my projects, I was asked to create a map of trade flows from a certain
 
 Thankfully, after going through the literature I found a paper by [Peterson (2021)](https://journals.sagepub.com/doi/abs/10.1177/00220027211014945) where he used a dataset to do exactly what I wanted.
 
-This repo is meant to document what I did throughout one evening of reading the R man pages, just to create a simple map plot for demo purposes.
+This repo is meant to document what I did throughout multiple evenings of reading the R man pages, just to create a simple map plot for demo purposes.
 
 ## Installing the required packages
 I needed to install some packages and call them as libraries first.
@@ -50,10 +50,13 @@ base_map <- ggplot() +
 ```
 
 ## Adding trade flows and displaying the final plot
-I then add the trade flows for each country and destination. Note that, with vectors, the trade flows will originate and go to each data point according to the ordering of the vectors. As you will see later on, this means that USA will always link with Mexico, Japan with Australia, and so forth. Real datasets in a .csv file would usually do this for every row anyway, so this should not be an issue. For this, I used a function to generate geodesic curves using the `geosphere` package.
+I then add the trade flows for each country and destination. Note that, with vectors, the trade flows will originate and go to each data point according to the ordering of the vectors. As you will see later on, this means that USA will always link with Mexico, Japan with Australia, and so forth. Real datasets in a .csv file would usually do this for every row anyway, so this should not be an issue. 
+
+For this, I used a function to generate geodesic curves using the `geosphere` package and, since it's a geodesic curve (the shortest path on a curve plane, like earth), I would need to create a path finding algorithm for a curve. Otherwise, the lines would all be straight, which does not make sense. Some reading for this [here](https://cran.r-project.org/web/packages/geosphere/vignettes/geosphere.pdf).
 
 ```
 generate_curve <- function(src_long, src_lat, dst_long, dst_lat) {
+
   # Calculate intermediate points on the geodesic curve
   gc_points <- gcIntermediate(c(src_long, src_lat), c(dst_long, dst_lat), n = 100, addStartEnd = TRUE, breakAtDateLine = TRUE)
   data.frame(
@@ -86,3 +89,56 @@ print(base_map)
 ```
 The end result is the following map plot:
 ![Map plot](https://github.com/hiu-sasongkojati/demo-trade-flow-r/blob/main/result%20map%20plot.png)
+
+## How about having one country as the trade source, while all the other countries are made as trade destinations?
+Some changes will have to be done to do that. Remember that using vectors to create a dataset means that you will need to have the same number of data points per vector. So even if you want only one country as the source, you will need to keep repeating it for every new destination country you entered. See below:
+```
+trade_data <- data.frame(
+  source = c("Japan", "Japan", "Japan", "Japan"),
+  dest = c("USA", "China", "Germany", "Australia"),
+  value = c(100, 200, 150, 120),
+  source_lat = c(36.2048, 36.2048, 36.2048, 36.2048),
+  source_long = c(138.2529, 138.2529, 138.2529, 138.2529),
+  dest_lat = c(37.0902, 35.8617, 51.1657, -25.2744),
+  dest_long = c(-95.7129, 104.1954, 10.4515, 133.7751)
+)
+```
+Then, since there is only one source country with multiple destination countries of varying distances, I need to take into account date lines. 
+
+Let's consider Japan and USA -- two countries at opposite ends of one another. When a geodesic line is calculated between these two points, the resulting path may lie on a single continuous line that crosses the international date line. I want to make sure that this line is plotted so that it appears on the map without being cut off by the international date line. Otherwise, the line would jump to the opposite side of the map to continue. Here is a simple visual representation of it:
+
+`Without accounting for the date line:          Japan ----> USA`
+
+`Accounting for the date line:                  Japan ---> Date line (split) ---> USA`
+
+I managed this using the `gcIntermediate` function by splitting the line into multiple segments. 
+
+```
+generate_curve <- function(src_long, src_lat, dst_long, dst_lat) {
+
+  # Calculate intermediate points on the geodesic curve
+  gc_points <- gcIntermediate(c(src_long, src_lat), c(dst_long, dst_lat), n = 100, addStartEnd = TRUE, breakAtDateLine = TRUE)
+
+  # Handle single segment output and multiple segments (split lines at date line)
+  if (is.matrix(gc_points)) {
+    data.frame(
+      lon = gc_points[, 1],
+      lat = gc_points[, 2],
+      group = i
+    )
+  } else {
+    do.call(
+      rbind,
+      lapply(gc_points, function(segment) {
+        data.frame(
+          lon = segment[, 1],
+          lat = segment[, 2],
+          group = i
+        )
+      })
+    )
+  }
+}
+```
+
+The other code segments should be similar to the originals above. Just copy and paste them and display the final plot using `print(base_map)`, like so:
