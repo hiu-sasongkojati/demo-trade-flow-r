@@ -142,3 +142,4 @@ generate_curve <- function(src_long, src_lat, dst_long, dst_lat) {
 ```
 
 The other code segments should be similar to the originals above. Just copy and paste them and display the final plot using `print(base_map)`, like so:
+![Map plot with multiple lines](https://github.com/hiu-sasongkojati/demo-trade-flow-r/blob/main/result%20map%20plot%20-%20multiple%20lines.png)
