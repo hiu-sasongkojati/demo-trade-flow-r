@@ -23,7 +23,7 @@ library(geosphere)
 ```
 
 ## Preparing the data
-Normally, I take data from a multi-gig dataset (which is hard to open in excel--you need a database software for this) like Harvard's Atlas of Economic Complexity (https://atlas.hks.harvard.edu/). But for demonstration purposes, I created vectors to represent a small database of countries with the trade sources, destinations, and the coordinates of both sources and destination countries.
+Normally, I take data from a multi-gig dataset which is hard to open in excel (you either use a database software or load them to RStudio directly using e.g. `read.csv`) like Harvard's Atlas of Economic Complexity (https://atlas.hks.harvard.edu/). But for demonstration purposes, I created vectors to represent a small database of countries with the trade sources, destinations, and the coordinates of both sources and destination countries.
 
 ```
 trade_data <- data.frame(
