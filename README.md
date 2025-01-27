@@ -1,6 +1,6 @@
 # demo-trade-flow-r
 
-In one of my projects, I was asked to create a map of trade flows from a certain country to destination countries for a given product and a given year. The problem is that I have never done this before, at all, let alone in R.
+In one of my projects, I thought about creating a map of trade flows from a certain country to destination countries for a given product in a given year. The problem is that I have never done this before, at all, let alone in R.
 
 Thankfully, after going through the literature I found a paper by [Peterson (2021)](https://journals.sagepub.com/doi/abs/10.1177/00220027211014945) where he used a dataset to do exactly what I wanted.
 
